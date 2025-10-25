@@ -1,0 +1,87 @@
+# Base Configuration for Medical Multimodal Model
+
+# Paths
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+
+# Model Architecture
+model:
+  vision_encoder:
+    name: "resnet50"  # Options: resnet50, resnet101, vit_base, vit_large
+    pretrained: true
+    freeze_backbone: false
+    feature_dim: 2048
+  
+  language_decoder:
+    name: "gpt2"  # Options: gpt2, gpt2-medium, bart-base, t5-small
+    pretrained: true
+    vocab_size: 50257
+    max_length: 256
+    
+  fusion:
+    attention_heads: 8
+    hidden_dim: 512
+    dropout: 0.1
+
+# Training
+training:
+  batch_size: 16
+  num_epochs: 50
+  learning_rate: 1e-4
+  weight_decay: 1e-5
+  warmup_steps: 1000
+  gradient_clip: 1.0
+  
+  optimizer:
+    name: "adamw"  # Options: adam, adamw, sgd
+    
+  scheduler:
+    name: "cosine"  # Options: cosine, linear, step
+    
+  early_stopping:
+    patience: 5
+    min_delta: 0.001
+
+# Data Augmentation
+augmentation:
+  image:
+    resize: [224, 224]
+    normalize: true
+    random_flip: 0.5
+    random_rotation: 10
+    brightness: 0.1
+    contrast: 0.1
+    
+  text:
+    max_length: 256
+    truncation: true
+    padding: "max_length"
+
+# Evaluation
+evaluation:
+  metrics: ["bleu", "rouge", "meteor", "cider"]
+  beam_size: 3
+  num_beams: 5
+  temperature: 0.8
+
+# Hardware
+hardware:
+  device: "cuda"  # Options: cuda, cpu
+  num_workers: 4
+  pin_memory: true
+  mixed_precision: true
+
+# Logging
+logging:
+  log_dir: "logs"
+  save_dir: "models/checkpoints"
+  save_freq: 1  # Save every N epochs
+  use_wandb: true
+  project_name: "medical-multimodal"
+  
+# Misc
+seed: 42
