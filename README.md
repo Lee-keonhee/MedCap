@@ -149,12 +149,12 @@ python app.py
 ## 🎯 Week 1 목표
 
 ### Day 1-2: 데이터 준비
-- [ ] ROCO 데이터셋 다운로드 (Kaggle 또는 GitHub)
-- [ ] 데이터셋 구조 탐색 및 분석
+- [*] ROCO 데이터셋 다운로드 (Kaggle 또는 GitHub)
+- [*] 데이터셋 구조 탐색 및 분석
   - 이미지 종류 분포 (CT, MRI, X-ray 등)
   - 캡션 길이 및 특성 분석
-- [ ] 데이터 전처리 파이프라인 구축
-- [ ] Train/Val/Test 분할 확인
+- [*] 데이터 전처리 파이프라인 구축
+- [*] Train/Val/Test 분할 확인
 
 ### Day 3-4: 베이스라인 모델
 - [ ] Vision Encoder 구현 (ResNet50/ViT)
