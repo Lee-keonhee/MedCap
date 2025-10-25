@@ -132,32 +132,49 @@ python app.py
 
 ## 📊 데이터셋
 
-### MIMIC-CXR
-- **설명**: 흉부 X-ray 이미지와 판독 리포트
-- **크기**: ~377,110 이미지, ~227,835 리포트
-- **링크**: https://physionet.org/content/mimic-cxr/
-
-### IU X-Ray
-- **설명**: 흉부 X-ray와 진단 리포트
-- **크기**: 7,470 이미지, 3,955 리포트
-- **링크**: https://openi.nlm.nih.gov/
+### ROCO (Radiology Objects in COntext) - 주 데이터셋
+- **설명**: 의료 영상과 캡션 데이터셋 (X-ray, CT, MRI, 초음파 등)
+- **크기**: 
+  - Train: ~65,000 이미지-캡션 쌍
+  - Validation: ~10,000 쌍
+  - Test: ~10,000 쌍
+- **링크**: https://github.com/razorx89/roco-dataset
+- **데이터 출처**: PubMed Central (https://www.ncbi.nlm.nih.gov/pmc/)
+- **특징**: 
+  - 다양한 의료 영상 종류 (CT, MRI, X-ray, 초음파 등)
+  - PubMed Central에서 수집된 실제 의료 논문의 이미지와 캡션
+  - 상대적으로 접근이 쉬움 (공개 데이터셋)
+  - 다운로드: Kaggle 또는 직접 수집
 
 ## 🎯 Week 1 목표
 
 ### Day 1-2: 데이터 준비
-- [ ] MIMIC-CXR 데이터셋 다운로드 및 탐색
+- [ ] ROCO 데이터셋 다운로드 (Kaggle 또는 GitHub)
+- [ ] 데이터셋 구조 탐색 및 분석
+  - 이미지 종류 분포 (CT, MRI, X-ray 등)
+  - 캡션 길이 및 특성 분석
 - [ ] 데이터 전처리 파이프라인 구축
-- [ ] Train/Val/Test 분할
+- [ ] Train/Val/Test 분할 확인
 
 ### Day 3-4: 베이스라인 모델
-- [ ] Vision Encoder 구현 (ResNet/ViT)
+- [ ] Vision Encoder 구현 (ResNet50/ViT)
+  - Pre-trained weights 로드
+  - Feature extraction layer 설정
 - [ ] Language Decoder 구현 (GPT-2/BART)
+  - Tokenizer 설정
+  - 의료 용어 vocabulary 확장 (optional)
 - [ ] 기본 학습 루프 작성
+  - DataLoader 구현
+  - Loss function 정의
 
 ### Day 5-7: 멀티모달 융합
 - [ ] Cross-attention 메커니즘 구현
+  - Image features → Query
+  - Text embeddings → Key, Value
 - [ ] 이미지-텍스트 융합 레이어
 - [ ] 초기 학습 및 검증
+  - 소규모 데이터로 overfitting 테스트
+  - 전체 데이터셋으로 학습 시작
 
 ## 📈 평가 지표
 
@@ -176,36 +193,14 @@ python app.py
 - **Visualization**: matplotlib, seaborn, plotly
 - **Deployment**: Gradio, Streamlit
 
-## 📝 참고 논문
-
-1. "Show and Tell: A Neural Image Caption Generator" (Vinyals et al., 2015)
-2. "Attention is All You Need" (Vaswani et al., 2017)
-3. "CLIP: Connecting Text and Images" (Radford et al., 2021)
-4. "CheXbert: Combining Automatic Labelers and Expert Annotations" (Smit et al., 2020)
-
-## 🤝 기여
-
-이 프로젝트는 개인 포트폴리오 목적으로 제작되었습니다.
-
-## 📄 라이선스
-
-MIT License
-
 ## 👤 작성자
 
-- **이름**: [Your Name]
-- **이메일**: [Your Email]
-- **GitHub**: [Your GitHub]
-- **LinkedIn**: [Your LinkedIn]
-
-## 🙏 감사의 글
-
-- MIMIC-CXR 데이터셋 제공: PhysioNet
-- Hugging Face Transformers 팀
-- PyTorch 커뮤니티
+- **이름**: 이건희
+- **이메일**: dlrjsgml0315@gmail.com
+- **GitHub**: https://github.com/Lee-keonhee/
 
 ---
 
 **프로젝트 진행 상황**: Week 1 준비 중 🚧
 
-**마지막 업데이트**: 2024-10-23
+**마지막 업데이트**: 2024-10-25
