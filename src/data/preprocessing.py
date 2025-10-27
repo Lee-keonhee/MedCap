@@ -47,8 +47,8 @@ def load_roco_data(data_path, split='train'):   #['train','val','test']
 
         data_list.append({'image_path': img_file_path, 'caption': caption})
 
-    print(f"\nLoaded {len(data_list)} samples from {split} split")
-    print(f'\nDamaged {len(damaged_file)} samples')
+    print(f"Loaded {len(data_list)} samples from {split} split")
+    print(f'Damaged {len(damaged_file)} samples')
     return data_list
 
 def preprocess_image(image_path):

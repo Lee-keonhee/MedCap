@@ -96,7 +96,7 @@ logging:
 
 # Validation
 validation:
-  batch_size: 32
+  batch_size: 16
   eval_every: 1
   num_samples: 5
 

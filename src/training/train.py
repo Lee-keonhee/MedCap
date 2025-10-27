@@ -91,7 +91,7 @@ def train_epoch(model, dataloader, optimizer, device, epoch):
         total_loss += loss.item()
         progress_bar.set_postfix({'train_loss' :f'{loss.item():.4f}'})
     epoch_loss = total_loss / len(dataloader)
-    print(f'\nEpoch {epoch} | Train Loss: {epoch_loss}')
+    print(f'Epoch {epoch} | Train Loss: {epoch_loss}')
     return epoch_loss
 
 
@@ -126,7 +126,7 @@ def eval_epoch(model, dataloader, device, epoch):
             progress_bar.set_postfix({'valid_loss' :f'{loss.item()}'})
 
         epoch_loss = total_loss / len(dataloader)
-        print(f'\nEpoch {epoch} | Validation Loss: {epoch_loss:.4f}')
+        print(f'Epoch {epoch} | Validation Loss: {epoch_loss:.4f}')
     return epoch_loss
 
 def save_checkpoint(model, optimizer, epoch, loss, save_path):
@@ -199,11 +199,15 @@ def main(config):
 
     best_val_loss = float('inf')
     os.makedirs(config['logging']['save_dir'], exist_ok=True)
+    loss_list = []
+    patience = int(config['training']['early_stopping']['patience'])  # 5 epoch 동안 개선 없으면 중단
+    patience_counter = 0
     for epoch in range(config['training']['num_epochs']):
         train_loss = train_epoch(model, train_loader, optimizer, device, epoch)
         val_loss = eval_epoch(model, val_loader, device, epoch)
 
         if (epoch+1) % config['logging']['save_freq'] == 0:
+
             save_path = os.path.join(config['logging']['save_dir'],
                                      f"{config['experiment']['name']}_epoch{epoch+1}.pth"
                                      )
@@ -211,13 +215,19 @@ def main(config):
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
+            patience_counter = 0
             best_path = os.path.join(
-                config['logging']['save_dir'],
-                f"\n{config['experiment']['name']}_best.pth"
+                config['logging']['save_dir'],f"{config['experiment']['name']}_best.pth"
             )
             torch.save(model.state_dict(), best_path)  # ← 모델만!
-            print(f"✅ New best! Val Loss: {val_loss:.4f}")
+            print(f"✅ New best! Val Loss: {val_loss:.4f}\n")
+        else:
+            patience_counter += 1
+            print(f"\nNo improvement for {patience_counter} epochs")
 
+            if patience_counter >= patience:
+                print(f"🛑 Early stopping at epoch {epoch}\n")
+                break
 if __name__ == '__main__':
     # print(torch.cuda.is_available())
     # 파라미터 설정 및 parser 설정

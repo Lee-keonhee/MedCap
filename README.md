@@ -124,7 +124,7 @@ python src/training/evaluate.py --model models/final/best_model.pth --data data/
 
 ```bash
 # 단일 이미지 예측
-python src/inference/predict.py --image path/to/image.jpg --model models/final/best_model.pth
+python src/inference/generate.py --image path/to/image.jpg --model models/final/best_model.pth
 
 # Gradio 웹 데모 실행
 python app.py
@@ -157,13 +157,13 @@ python app.py
 - [x] Train/Val/Test 분할 확인
 
 ### Day 3-4: 베이스라인 모델
-- [ ] Vision Encoder 구현 (ResNet50/ViT)
+- [x] Vision Encoder 구현 (ResNet50/ViT)
   - Pre-trained weights 로드
   - Feature extraction layer 설정
-- [ ] Language Decoder 구현 (GPT-2/BART)
+- [x] Language Decoder 구현 (GPT-2/BART)
   - Tokenizer 설정
   - 의료 용어 vocabulary 확장 (optional)
-- [ ] 기본 학습 루프 작성
+- [x] 기본 학습 루프 작성
   - DataLoader 구현
   - Loss function 정의
 
