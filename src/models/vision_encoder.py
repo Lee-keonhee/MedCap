@@ -19,11 +19,18 @@ class VisionEncoder(nn.Module):
         # resnet 구현
         if model_name == 'resnet50':
             weights = models.ResNet50_Weights.IMAGENET1K_V1 if pretrained else None
-            self.backbone = models.resnet50(weights=weights)
+            self.backbone = models.resnet50(weights=weights)                # resnet-50의 feature_dim=2048임
+            backbone_dim = self.backbone.fc.in_features
             self.backbone.fc = nn.Identity()
-        #
+
+        # TODO: vision-transformer 구현
         # elif model_name == 'vit_base' and pretrained:
         #     self.backbone = transformers.VisionTransformer.from_pretrained(model_name)
+
+        if backbone_dim != self.feature_dim:
+            self.projection = nn.Linear(backbone_dim, feature_dim)
+        else:
+            self.projection = nn.Identity()
 
     def forward(self, images):
         """
@@ -34,6 +41,7 @@ class VisionEncoder(nn.Module):
             features: (batch_size, feature_dim)
         """
         encoded = self.backbone(images)
+        encoded = self.projection(encoded)
         return encoded
 
 
@@ -41,7 +49,7 @@ class VisionEncoder(nn.Module):
 if __name__ == '__main__':
     # 테스트
     encoder = VisionEncoder(model_name='resnet50', pretrained=True)
-
+    # print(encoder.backbone)
     # 더미 입력
     dummy_images = torch.randn(4, 3, 224, 224)
 

@@ -1,7 +1,9 @@
+--extra-index-url https://download.pytorch.org/whl/cu128
+
 # Project 1: Medical Multimodal Report Generation
 # Core Deep Learning
-torch>=2.0.0
-torchvision>=0.15.0
+torch==2.7.0+cu128
+torchvision==0.22.0+cu128
 pytorch-lightning>=2.0.0
 
 # Transformers & NLP

@@ -4,8 +4,8 @@ from PIL import Image
 import re
 from tqdm import tqdm
 
-os.chdir('E:/claude_project/project1_medical_multimodal')
-print(os.getcwd())
+# os.chdir('E:/claude_project/project1_medical_multimodal')
+# print(os.getcwd())
 
 def load_roco_data(data_path, split='train'):   #['train','val','test']
     '''
@@ -27,16 +27,18 @@ def load_roco_data(data_path, split='train'):   #['train','val','test']
     data_list = []
     with open(csv_path, 'r', encoding='utf-8') as f:
         df = pd.read_csv(f)
-    print(f"Loading {split} data...")
+    print(f"\nLoading {split} data...")
 
     image_dir = os.path.join(base_dir, 'images')
+    damaged_file = []
     # csv파일 내 파일명, 캡션 추출
     for index, row in tqdm(df.iterrows(), total=len(df), desc=f'Loading {split} data...'):
         img_file_name = row['name']
         img_file_path = os.path.join(image_dir, img_file_name)
 
         if not os.path.exists(img_file_path):
-            print(f"Warning: Image not found - {img_file_path}")
+            # print(f"Warning: Image not found - {img_file_path}")
+            damaged_file.append(img_file_name)
             continue
 
         caption = row['caption'].strip()
@@ -45,7 +47,8 @@ def load_roco_data(data_path, split='train'):   #['train','val','test']
 
         data_list.append({'image_path': img_file_path, 'caption': caption})
 
-    print(f"Loaded {len(data_list)} samples from {split} split")
+    print(f"\nLoaded {len(data_list)} samples from {split} split")
+    print(f'\nDamaged {len(damaged_file)} samples')
     return data_list
 
 def preprocess_image(image_path):

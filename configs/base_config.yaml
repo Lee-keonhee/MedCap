@@ -1,8 +1,18 @@
 # Base Configuration for Medical Multimodal Model
 
+experiment:
+  name: "Base_Model"
+  descriptsion: "encoder:resnet50, decoder:gpt2"
+  seed: 42
+
+
+# Misc
+seed: 42
+
+
 # Paths
 data:
-  raw_dir: "data/raw"
+  raw_dir: "data/raw/ROCO/all_data"
   processed_dir: "data/processed"
   train_split: 0.8
   val_split: 0.1
@@ -30,7 +40,7 @@ model:
 # Training
 training:
   batch_size: 16
-  num_epochs: 50
+  num_epochs: 10
   learning_rate: 1e-4
   weight_decay: 1e-5
   warmup_steps: 1000
@@ -71,7 +81,7 @@ evaluation:
 # Hardware
 hardware:
   device: "cuda"  # Options: cuda, cpu
-  num_workers: 4
+  num_workers: 0
   pin_memory: true
   mixed_precision: true
 
@@ -82,6 +92,36 @@ logging:
   save_freq: 1  # Save every N epochs
   use_wandb: true
   project_name: "medical-multimodal"
-  
-# Misc
-seed: 42
+
+
+# Validation
+validation:
+  batch_size: 32
+  eval_every: 1
+  num_samples: 5
+
+# Checkpoints
+checkpoint:
+  save_best_only: true
+  monitor: "val_loss"
+  mode: "min"
+  save_last: true
+  resume_from: null
+
+# Generation (Inference)
+generation:
+  max_new_tokens: 256
+  min_length: 10
+  do_sample: true
+  top_k: 50
+  top_p: 0.95
+  temperature: 0.8
+  repetition_penalty: 1.2
+  num_return_sequences: 1
+
+# Debug Mode (optional)
+debug:
+  enabled: false
+  num_train_samples: 100
+  num_val_samples: 20
+  fast_dev_run: false  # 1 epoch만 빠르게 실행

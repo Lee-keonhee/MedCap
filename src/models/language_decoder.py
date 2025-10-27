@@ -16,9 +16,13 @@ class LanguageDecoder(nn.Module):
         self.gpt2 = GPT2LMHeadModel.from_pretrained(model_name)
 
         # 2. GPT-2의 hidden size 확인
-        self.hidden_size = self.gpt2.config.hidden_size
+        self.hidden_size = self.gpt2.config.hidden_size         # 768
+
         # 3. Projection layer 생성 (image_feature_dim → gpt2_hidden_size)
-        self.projection = nn.Linear(image_feature_dim, self.hidden_size)
+        if image_feature_dim != self.hidden_size:
+            self.projection = nn.Linear(image_feature_dim, self.hidden_size)
+        else:
+            self.projection = nn.Identity()
 
         self.ln = nn.LayerNorm(self.hidden_size)
         self.dropout = nn.Dropout(0.1)
@@ -34,18 +38,34 @@ class LanguageDecoder(nn.Module):
             outputs: GPT-2 출력 (logits, loss 등)
         """
         # TODO: 구현해야 할 것들
-        # 1. Image features를 GPT-2 hidden size로 변환
+        # 1. Image embedding 생성
         projected_features = self.projection(image_features)  # (B, 768)
+        projected_features = self.ln(projected_features)
+        projected_features = self.dropout(projected_features)
 
-        # 2. (나중에) Text embeddings과 결합
+        # 2.  Text embedding과 결합
         image_embeddings = projected_features.unsqueeze(1)      # B, 1, 768
-        text_embeddings = self.gpt2.transformer.wte(projected_features)     # B, seq_len, 768
-        inputs_embeds = torch.cat([image_embeddings, text_embeddings], dim=1)  # (B, 1+seq_len, 768)
-
-        # 3. GPT-2 forward
-
         if input_ids is not None:
-            outputs = self.gpt2(input_ids = input_ids,
+            text_embeddings = self.gpt2.transformer.wte(input_ids)     # B, seq_len, 768
+            inputs_embeds = torch.cat([image_embeddings, text_embeddings], dim=1)  # (B, 1+seq_len, 768)
+            # 3. Attention mask 확장
+            if attention_mask is not None:
+                # Image token은 항상 attend (1)
+                image_mask = torch.ones((attention_mask.shape[0],1),
+                                        dtype=attention_mask.dtype,
+                                        device=attention_mask.device)
+                attention_mask = torch.cat([image_mask, attention_mask], dim=1)
+            # 4. Labels 확장
+            if labels is not None:
+                # Image token 위치는 loss 계산 안 함 (-100)
+                image_labels = torch.full(size=(labels.shape[0],1),
+                                          fill_value=-100,
+                                          dtype=labels.dtype,
+                                          device=labels.device)
+                labels = torch.cat([image_labels, labels], dim=1)
+            # 3. GPT-2 forward
+
+            outputs = self.gpt2(inputs_embeds = inputs_embeds,
                                 attention_mask = attention_mask,
                                 labels=labels,)
             return outputs
@@ -56,14 +76,16 @@ class LanguageDecoder(nn.Module):
 
 if __name__ == '__main__':
     decoder = LanguageDecoder(model_name='gpt2', image_feature_dim=2048)
+
     # 더미 입력
-    dummy_image_features = torch.randn(4, 2048)
-    dummy_input_ids = torch.randint(0, 50257, (4, 20))  # GPT-2 vocab size
+    image_features = torch.randn(4, 2048)
+    input_ids = torch.randint(0, 50257, (4, 20))
+    attention_mask = torch.ones(4, 20)
+    labels = torch.randint(0, 50257, (4, 20))
 
     # Forward
-    outputs = decoder(dummy_image_features, input_ids=dummy_input_ids)
+    outputs = decoder(image_features, input_ids, attention_mask, labels)
 
-    print(f"Image features shape: {dummy_image_features.shape}")
-    print(f"Input IDs shape: {dummy_input_ids.shape}")
-    print(f"Output logits shape: {outputs.logits.shape}")
-    print(f"Expected: torch.Size([4, 20, 50257])")
+    print(f"Logits shape: {outputs.logits.shape}")
+    print(f"Expected: torch.Size([4, 21, 50257])")  # 20+1
+    print(f"Loss: {outputs.loss.item():.4f}")
